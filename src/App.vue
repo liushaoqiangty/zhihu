@@ -1,31 +1,60 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <router-view :top_stories="top_stories" :stories="stories"  v-if="show"/>
   </div>
 </template>
 
+<script>
+import axios from "axios";
+export default {
+  name: "App",
+  data() {
+    return {
+      stories: [],
+      top_stories: [],
+      show: false
+    };
+  },
+  mounted() {
+    this.getStoriesData();
+  },
+  methods: {
+    // async getStoriesData() {
+    //   try {
+    //     console.log("23");
+    //     var url = "/api/4/news/latest";
+    //     let res = await this.$http("https://news-at.zhihu.com" + url);
+    //     res = res.stories;
+    //     console.log(res);
+    //     this.stories = res;
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
+    getStoriesData() {
+      var url = "/4/news/latest"; //这里是拼接url
+      return axios
+        .get("/api" + url) // 这里就是刚才的config/index.js中的/api
+        .then(res => {
+          if (res.status == 200) {
+            // console.log(res);
+            
+            // res.json(res.data.top_stories)
+            this.$nextTick(() => {
+              // this.stories = res.data.stories;
+              this.stories = res.data.stories;
+              this.top_stories = res.data.top_stories;
+              this.show = !this.show
+            });
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
+  }
+};
+</script>
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-}
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
